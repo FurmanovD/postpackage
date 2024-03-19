@@ -1,0 +1,12 @@
+FROM golang:1.21.8-alpine
+
+RUN apk update && apk add --no-cache build-base make
+
+COPY ./ /project
+
+WORKDIR /project
+
+ENV GO111MODULE=on
+ENV GOSUMDB=off
+
+ENTRYPOINT ["make", "test"]

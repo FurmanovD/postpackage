@@ -1,0 +1,46 @@
+version: '3.7'
+
+networks:
+  dev_net:
+    name: dev_net
+    external: false
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    build:
+      context: .
+    restart: always
+    container_name: db
+    environment:
+      MYSQL_DATABASE: 'default'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    networks:
+      - dev_net
+    expose:
+      - "3306"
+    volumes:
+      - ./../test/db:/var/lib/mysql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 5s
+        retries: 20
+
+  api:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+      args:
+        IMAGE_TAG: $IMAGE_TAG
+    container_name: api
+    ports:
+      - "8080:8080"
+    depends_on:
+        mysqldb:
+            condition: service_healthy
+    networks:
+      - dev_net
