@@ -1,0 +1,16 @@
+version: '3.7'
+
+networks:
+  dev_net:
+    name: dev_net    
+    external: false
+
+services:
+  tests:
+    build:
+      dockerfile: ./Dockerfile.tests
+      context: .
+    container_name: $TEST_CONTAINER
+    networks:
+      - dev_net
+  
